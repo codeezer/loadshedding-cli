@@ -1,21 +1,22 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-import requests
-from bs4 import BeautifulSoup
+import getTables
 import re
+import colors as c
 
-r = requests.get('http://myrepublica.com/load-shedding.html')
-soup = BeautifulSoup(r.text,'html.parser')
-rows = soup.find_all('tr')
-table = []
-for each_row in rows:
-    columns = each_row.find_all('td')
-    columns = [ele.text.strip() for ele in columns]
-    table.append([ele for ele in columns if ele])
-
-
-for data in table:
-    for row in data:
-        print(row,end='\t')
-    print('\n')
+tables = getTables.getTables()
+times = []
+days = []
+for row in tables[1:8]:
+    for each_day in row:
+        times.append(re.split('\n| ',each_day))
+count = 0
+for time in times:
+    if count == 8:
+        count = 0
+    if count == 0:
+        print(c.END+time[0]+' '+time[1])
+    else:
+        print(c.ORANGE+tables[0][count],end = '\t'+c.END)
+        for row in time:
+            print(c.CYAN+row,end = ' '+c.CYAN)
+        print('\n')
+    count = count + 1
